@@ -13,11 +13,15 @@
                     <EntryCell
                         Label="Columns"
                         Text="{Binding MatrixColumns}"/>
+                    <ViewCell>
+                        <StackLayout>
+                            <Button Text="Create Matrix" Clicked="CreateMatrix_OnClicked"/>
+                            <Grid x:Name="MatrixGrid"/>
+                        </StackLayout>
+                    </ViewCell>
                 </TableSection>
             </TableRoot>
         </TableView>
-        <Button Text="Create Matrix" Clicked="CreateMatrix_OnClicked"/>
-        <Grid x:Name="MatrixGrid"/>
     </StackLayout>
 
 </ContentPage>
