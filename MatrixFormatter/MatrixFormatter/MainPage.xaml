@@ -4,24 +4,17 @@
              x:Class="MatrixFormatter.MainPage">
 
     <StackLayout>
-        <TableView Intent="Settings">
-            <TableRoot>
-                <TableSection Title="Matrix Size">
-                    <EntryCell
-                        Label="Rows:"
-                        Text="{Binding MatrixRows}"/>
-                    <EntryCell
-                        Label="Columns"
-                        Text="{Binding MatrixColumns}"/>
-                    <ViewCell>
-                        <StackLayout>
-                            <Button Text="Create Matrix" Clicked="CreateMatrix_OnClicked"/>
-                            <Grid x:Name="MatrixGrid"/>
-                        </StackLayout>
-                    </ViewCell>
-                </TableSection>
-            </TableRoot>
-        </TableView>
+        <Label Text="Matrix Size" FontSize="Large"/>
+        <StackLayout Orientation="Horizontal">
+            <Label Text="Rows: "/>
+            <Entry Text="{Binding MatrixRows}"/>
+        </StackLayout>
+        <StackLayout Orientation="Horizontal">
+            <Label Text="Columns:"/>
+            <Entry Text="{Binding MatrixColumns}"/>
+        </StackLayout>
+        <Button Text="Create Matrix" Clicked="CreateMatrix_OnClicked"/>
+        <Grid x:Name="MatrixGrid"/>
     </StackLayout>
 
 </ContentPage>
