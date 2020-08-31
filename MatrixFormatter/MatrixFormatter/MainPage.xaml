@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MatrixFormatter.MainPage">
 
-    <StackLayout x:Name="MainLayout">
+    <StackLayout>
         <TableView Intent="Settings">
             <TableRoot>
                 <TableSection Title="Matrix Size">
@@ -17,6 +17,7 @@
             </TableRoot>
         </TableView>
         <Button Text="Create Matrix" Clicked="CreateMatrix_OnClicked"/>
+        <Grid x:Name="MatrixGrid"/>
     </StackLayout>
 
 </ContentPage>

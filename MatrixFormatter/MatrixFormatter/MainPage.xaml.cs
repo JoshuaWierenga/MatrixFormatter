@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using Xamarin.Forms;
 
 namespace MatrixFormatter
 {
     public partial class MainPage : ContentPage
     {
+        //todo Change default to be positive
+        //todo Ensure input is a positive integer
         public static readonly BindableProperty MatrixRowsProperty =
             BindableProperty.Create(
                 propertyName: "MatrixRows",
@@ -31,39 +33,58 @@ namespace MatrixFormatter
             set => SetValue(MatrixColumnsProperty, value);
         }
 
-        Grid matrix = new Grid();
-
         public MainPage()
         {
             InitializeComponent();
-            MainLayout.Children.Add(matrix);
             BindingContext = this;
         }
 
         private void CreateMatrix_OnClicked(object sender, EventArgs e)
         {
-            //Todo keep existing if possible
-            matrix.RowDefinitions.Clear();
-            matrix.ColumnDefinitions.Clear();
-            matrix.Children.Clear();
-
-            for (int i = 0; i < MatrixRows + 1; i++)
+            RowDefinition newRow = new RowDefinition
             {
-                RowDefinition newRow = new RowDefinition();
+                Height = GridLength.Auto
+            };
+            ColumnDefinition newColumn = new ColumnDefinition();
 
+            //Todo keep existing if possible
+            MatrixGrid.Children.Clear();
+
+            for (int i = 0; i < Math.Max(MatrixRows, MatrixGrid.RowDefinitions.Count); i++)
+            {
                 if (i < MatrixRows)
                 {
-                    newRow.Height = GridLength.Auto;
-                    
-                    matrix.ColumnDefinitions.Add(new ColumnDefinition());
-
-                    for (int j = 0; j < MatrixColumns; j++)
+                    if (MatrixGrid.RowDefinitions.Count < i + 1)
                     {
-                        matrix.Children.Add(new Entry(), i, i + 1, j, j + 1);
+                        MatrixGrid.RowDefinitions.Add(newRow);
+                    }
+
+                    for (int j = 0; j < Math.Max(MatrixColumns, MatrixGrid.ColumnDefinitions.Count); j++)
+                    {
+                        if (j < MatrixColumns)
+                        {
+                            if (MatrixGrid.ColumnDefinitions.Count < j + 1)
+                            {
+                                MatrixGrid.ColumnDefinitions.Add(newColumn);
+                            }
+
+                            MatrixGrid.Children.Add(new Entry(), i, i + 1, j, j + 1);
+                        }
+                        else
+                        {
+                            MatrixGrid.ColumnDefinitions.RemoveAt(i);
+                        }
                     }
                 }
-
-                matrix.RowDefinitions.Add(newRow);
+                //Todo fix this, it is currently not being used
+                else if (i == MatrixRows && i >= MatrixGrid.RowDefinitions.Count)
+                {
+                    MatrixGrid.RowDefinitions.Add(new RowDefinition());
+                }
+                else
+                {
+                    MatrixGrid.RowDefinitions.RemoveAt(i);
+                }
             }
         }
     }
