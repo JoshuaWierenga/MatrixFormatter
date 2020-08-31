@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MatrixFormatter.MainPage">
 
-    <StackLayout>
+    <StackLayout x:Name="MainLayout">
         <TableView Intent="Settings">
             <TableRoot>
                 <TableSection Title="Matrix Size">

@@ -31,16 +31,40 @@ namespace MatrixFormatter
             set => SetValue(MatrixColumnsProperty, value);
         }
 
+        Grid matrix = new Grid();
+
         public MainPage()
         {
             InitializeComponent();
+            MainLayout.Children.Add(matrix);
             BindingContext = this;
         }
 
         private void CreateMatrix_OnClicked(object sender, EventArgs e)
         {
-            int test = MatrixRows;
-            int test2 = MatrixColumns;
+            //Todo keep existing if possible
+            matrix.RowDefinitions.Clear();
+            matrix.ColumnDefinitions.Clear();
+            matrix.Children.Clear();
+
+            for (int i = 0; i < MatrixRows + 1; i++)
+            {
+                RowDefinition newRow = new RowDefinition();
+
+                if (i < MatrixRows)
+                {
+                    newRow.Height = GridLength.Auto;
+                    
+                    matrix.ColumnDefinitions.Add(new ColumnDefinition());
+
+                    for (int j = 0; j < MatrixColumns; j++)
+                    {
+                        matrix.Children.Add(new Entry(), i, i + 1, j, j + 1);
+                    }
+                }
+
+                matrix.RowDefinitions.Add(newRow);
+            }
         }
     }
 }
