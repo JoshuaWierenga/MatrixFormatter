@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using Windows.UI.Xaml.Media;
 using MatrixFormatter;
 using MatrixFormatter.UWP;
 using Xamarin.Forms.Platform.UWP;

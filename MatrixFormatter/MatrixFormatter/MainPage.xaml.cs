@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace MatrixFormatter
@@ -69,7 +70,7 @@ namespace MatrixFormatter
                 }
             }
             
-            //Todo figure out how to edit grid in place despite its single dimensional array
+            //Todo figure out how to edit grid in place despite it being a single dimensional array
             MatrixGrid.Children.Clear();
 
             for (int i = 0; i < Math.Max(MatrixRows, MatrixGrid.RowDefinitions.Count); i++)
@@ -115,6 +116,8 @@ namespace MatrixFormatter
                     MatrixGrid.RowDefinitions.RemoveAt(i);
                 }
             }
+
+            ExportButton.IsVisible = true;
         }
 
         private void ToggleCells_OnClicked(object sender, EventArgs e)
@@ -127,6 +130,37 @@ namespace MatrixFormatter
 
             Button toggleButton = (Button)sender;
             toggleButton.Text = toggleButton.Text == "Hide Matrix Cells" ? "Show Matrix Cells" : "Hide Matrix Cells";
+        }
+
+        private void Export_OnClicked(object sender, EventArgs e)
+        {
+            string onenoteMatrixString = "■(";
+
+            //todo Replace with a single for loop to improve performance
+            for (int i = 0; i < MatrixGrid.RowDefinitions.Count; i++)
+            {
+                for (int j = 0; j < MatrixGrid.ColumnDefinitions.Count; j++)
+                {
+                    onenoteMatrixString +=
+                        ((BorderEntry) MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j]).Text;
+
+                    if (j < MatrixGrid.ColumnDefinitions.Count - 1)
+                    {
+                        onenoteMatrixString += '&';
+                    }
+                }
+
+                if (i < MatrixGrid.RowDefinitions.Count - 1)
+                {
+                    onenoteMatrixString += '@';
+                }
+            }
+
+            onenoteMatrixString += ')';
+
+            //todo Determine how to use mathml clipboard type to allow pasting into onenote within a equation
+            Clipboard.SetTextAsync(onenoteMatrixString);
+            DependencyService.Get<IMessageToast>().DisplayToast("Copied to Clipboard.");
         }
     }
 }
