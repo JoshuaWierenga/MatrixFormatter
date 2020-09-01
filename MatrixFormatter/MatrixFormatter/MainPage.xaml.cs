@@ -135,13 +135,9 @@ namespace MatrixFormatter
 
             CreateMatrix();
 
-            //todo Replace with a single for loop to improve performance
-            for (int i = 0; i < MatrixGrid.RowDefinitions.Count; i++)
+            foreach (BorderEntry view in MatrixGrid.Children)
             {
-                for (int j = 0; j < MatrixGrid.ColumnDefinitions.Count; j++)
-                {
-                    ((BorderEntry)MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j]).Text = i == j ? "1" : "0";
-                }
+                view.Text = Grid.GetRow(view) == Grid.GetColumn(view) ? "1" : "0";
             }
         }
 
@@ -157,69 +153,30 @@ namespace MatrixFormatter
             toggleButton.Text = toggleButton.Text == "Hide Matrix Cells" ? "Show Matrix Cells" : "Hide Matrix Cells";
         }
 
-        private string MatrixToStringUnicodeMath()
-        {
-            string unicodeMathMatrixString = "■(";
-
-            //todo Replace with a single for loop to improve performance
-            for (int i = 0; i < MatrixGrid.RowDefinitions.Count; i++)
-            {
-                for (int j = 0; j < MatrixGrid.ColumnDefinitions.Count; j++)
-                {
-                    unicodeMathMatrixString +=
-                        ((BorderEntry)MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j]).Text;
-
-                    if (j < MatrixGrid.ColumnDefinitions.Count - 1)
-                    {
-                        unicodeMathMatrixString += '&';
-                    }
-                }
-
-                if (i < MatrixGrid.RowDefinitions.Count - 1)
-                {
-                    unicodeMathMatrixString += '@';
-                }
-            }
-
-            unicodeMathMatrixString += ')';
-
-            return unicodeMathMatrixString;
-        }
-
-        //todo Join with UnicodeMath string converter, function structure is identical, only string structure varies
-        //todo Support bracket/paren delimiters, i.e. pmatrix, Bmatrix,...
-        private string MatrixToStringAmsmath()
-        {
-            string amsmathMatrixString = @"\begin{matrix}";
-
-            //todo Replace with a single for loop to improve performance
-            for (int i = 0; i < MatrixGrid.RowDefinitions.Count; i++)
-            {
-                for (int j = 0; j < MatrixGrid.ColumnDefinitions.Count; j++)
-                {
-                    amsmathMatrixString +=
-                        ((BorderEntry)MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j]).Text;
-
-                    if (j < MatrixGrid.ColumnDefinitions.Count - 1)
-                    {
-                        amsmathMatrixString += " & ";
-                    }
-                }
-
-                if (i < MatrixGrid.RowDefinitions.Count - 1)
-                {
-                    amsmathMatrixString += @"\\";
-                }
-            }
-
-            amsmathMatrixString += @"\end{matrix}";
-
-            return amsmathMatrixString;
-        }
-
+        //todo Support latex bracket/paren delimiters, i.e. pmatrix, Bmatrix,...
         private void Export_OnClicked(object sender, EventArgs e)
         {
-            string matrixString = FormatPicker.SelectedIndex == 0 ? MatrixToStringUnicodeMath() : MatrixToStringAmsmath();
+            bool latexFormat = FormatPicker.SelectedIndex == 1;
+            string matrixString = latexFormat ? @"\begin{matrix}" : "■(";
+
+            foreach (BorderEntry view in MatrixGrid.Children)
+            {
+                matrixString += view.Text;
+
+                if (Grid.GetColumn(view) == MatrixGrid.ColumnDefinitions.Count - 1)
+                {
+                    if (Grid.GetRow(view) != MatrixGrid.RowDefinitions.Count - 1)
+                    {
+                        matrixString += latexFormat ? @"\\" : "@";
+                    }
+                }
+                else
+                {
+                    matrixString += latexFormat ? " & " : "&";
+                }
+            }
+
+            matrixString += latexFormat ? @"\end{matrix}" : ")";
 
             //todo Determine how to use mathml clipboard type to allow pasting into onenote within a equation
             Clipboard.SetTextAsync(matrixString);
