@@ -120,6 +120,26 @@ namespace MatrixFormatter
             ExportButton.IsVisible = true;
         }
 
+        private void CreateIdentityMatrix_OnClicked(object sender, EventArgs e)
+        {
+            if (MatrixRows != MatrixColumns)
+            {
+                DependencyService.Get<IMessageToast>().DisplayToast("Matrix must be square.");
+                return;
+            }
+
+            CreateMatrix_OnClicked(sender, e);
+
+            //todo Replace with a single for loop to improve performance
+            for (int i = 0; i < MatrixGrid.RowDefinitions.Count; i++)
+            {
+                for (int j = 0; j < MatrixGrid.ColumnDefinitions.Count; j++)
+                {
+                    ((BorderEntry)MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j]).Text = i == j ? "1" : "0";
+                }
+            }
+        }
+
         private void ToggleCells_OnClicked(object sender, EventArgs e)
         {
             foreach (BorderEntry view in MatrixGrid.Children)

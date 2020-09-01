@@ -15,6 +15,7 @@
         </StackLayout>
         <StackLayout Orientation="Horizontal">
             <Button Text="Create Matrix" Clicked="CreateMatrix_OnClicked"/>
+            <Button Text="Create Identity Matrix" Clicked="CreateIdentityMatrix_OnClicked"/>
             <Button Text="Hide Matrix Cells" Clicked="ToggleCells_OnClicked"/>
             <Button x:Name="ExportButton" Text="Export Matrix to OneNote" IsVisible="False" Clicked="Export_OnClicked"/>
         </StackLayout>
