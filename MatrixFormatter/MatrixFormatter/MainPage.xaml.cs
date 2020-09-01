@@ -1,12 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using MatrixFormatter.Format;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace MatrixFormatter
 {
+    //Add ViewModel to reduce the size of this class
     public partial class MainPage : ContentPage
     {
+        //todo remove the binds since changes to these doesn't update the matrix directly, should it?
         //todo Change default to be positive
         //todo Ensure input is a positive integer
         public static readonly BindableProperty MatrixRowsProperty =
@@ -32,6 +36,16 @@ namespace MatrixFormatter
         {
             get => int.Parse((string)GetValue(MatrixColumnsProperty));
             set => SetValue(MatrixColumnsProperty, value);
+        }
+
+        public MatrixStringFormat SelectedFormat { get; set; }
+
+        public List<string> MatrixStringFormats
+        {
+            get
+            {
+                return Enum.GetNames(typeof(MatrixStringFormat)).Select(b => b.SplitCamelCase()).ToList();
+            }
         }
 
         public MainPage()
@@ -156,7 +170,7 @@ namespace MatrixFormatter
         //todo Support latex bracket/paren delimiters, i.e. pmatrix, Bmatrix,...
         private void Export_OnClicked(object sender, EventArgs e)
         {
-            bool latexFormat = FormatPicker.SelectedIndex == 1;
+            bool latexFormat = SelectedFormat == MatrixStringFormat.LatexAmsmath;
             string matrixString = latexFormat ? @"\begin{matrix}" : "■(";
 
             foreach (BorderEntry view in MatrixGrid.Children)
@@ -185,8 +199,7 @@ namespace MatrixFormatter
 
         private async void Import_OnClicked(object sender, EventArgs e)
         {
-            //Todo add emum to make it clearer what the indices mean
-            if (FormatPicker.SelectedIndex == 1)
+            if (SelectedFormat == MatrixStringFormat.LatexAmsmath)
             {
                 DependencyService.Get<IMessageToast>().DisplayToast("Not yet supported.");
                 return;

@@ -1,7 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:format="clr-namespace:MatrixFormatter.Format;assembly=MatrixFormatter"
              x:Class="MatrixFormatter.MainPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <format:IntEnumConverter x:Key="IntEnum"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <StackLayout>
         <Label Text="Matrix Size" FontSize="Large"/>
@@ -20,15 +26,7 @@
             
             <Button HorizontalOptions="EndAndExpand" Text="Import Matrix" Clicked="Import_OnClicked"/>
             <Button x:Name="ExportButton" Text="Export Matrix" IsVisible="False" Clicked="Export_OnClicked"/>
-            <Picker x:Name="FormatPicker">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>Microsoft Office UnicodeMath</x:String>
-                        <x:String>Latex Amsmath</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-                <Picker.SelectedIndex>0</Picker.SelectedIndex>
-            </Picker>
+            <Picker ItemsSource="{Binding MatrixStringFormats}" SelectedIndex="{Binding SelectedFormat, Converter={StaticResource IntEnum}}" />
         </StackLayout>
         <Grid x:Name="MatrixGrid"/>
     </StackLayout>
