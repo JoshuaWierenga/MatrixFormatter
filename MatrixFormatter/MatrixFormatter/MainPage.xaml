@@ -13,7 +13,10 @@
             <Label Text="Columns:"/>
             <Entry Text="{Binding MatrixColumns}"/>
         </StackLayout>
-        <Button Text="Create Matrix" Clicked="CreateMatrix_OnClicked"/>
+        <StackLayout Orientation="Horizontal">
+            <Button Text="Create Matrix" Clicked="CreateMatrix_OnClicked"/>
+            <Button Text="Hide Matrix Cells" Clicked="ToggleCells_OnClicked"/>
+        </StackLayout>
         <Grid x:Name="MatrixGrid"/>
     </StackLayout>
 

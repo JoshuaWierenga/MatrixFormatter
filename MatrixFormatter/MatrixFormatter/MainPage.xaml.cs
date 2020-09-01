@@ -48,7 +48,7 @@ namespace MatrixFormatter
                 return;
             }
 
-            View[,] cells = null;
+            BorderEntry[,] cells = null;
 
             RowDefinition newRow = new RowDefinition
             {
@@ -58,13 +58,13 @@ namespace MatrixFormatter
 
             if (MatrixGrid.RowDefinitions.Count != 0)
             {
-                 cells = new View[Math.Min(MatrixRows, MatrixGrid.RowDefinitions.Count), Math.Min(MatrixColumns, MatrixGrid.ColumnDefinitions.Count)];
+                 cells = new BorderEntry[Math.Min(MatrixRows, MatrixGrid.RowDefinitions.Count), Math.Min(MatrixColumns, MatrixGrid.ColumnDefinitions.Count)];
 
                 for (int i = 0; i < cells.GetLength(0); i++)
                 {
                     for (int j = 0; j < cells.GetLength(1); j++)
                     {
-                        cells[i, j] = MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j];
+                        cells[i, j] = (BorderEntry)MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j];
                     }
                 }
             }
@@ -96,7 +96,7 @@ namespace MatrixFormatter
                             }
                             else
                             {
-                                MatrixGrid.Children.Add(new Entry(), j, j + 1, i, i + 1);
+                                MatrixGrid.Children.Add(new BorderEntry(), j, j + 1, i, i + 1);
                             }
                         }
                         else
@@ -115,6 +115,18 @@ namespace MatrixFormatter
                     MatrixGrid.RowDefinitions.RemoveAt(i);
                 }
             }
+        }
+
+        private void ToggleCells_OnClicked(object sender, EventArgs e)
+        {
+            foreach (BorderEntry view in MatrixGrid.Children)
+            {
+                view.IsReadOnly = !view.IsReadOnly;
+                view.IsBorderVisible = !view.IsBorderVisible;
+            }
+
+            Button toggleButton = (Button)sender;
+            toggleButton.Text = toggleButton.Text == "Hide Matrix Cells" ? "Show Matrix Cells" : "Hide Matrix Cells";
         }
     }
 }
