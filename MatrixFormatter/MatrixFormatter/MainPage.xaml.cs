@@ -157,43 +157,89 @@ namespace MatrixFormatter
             toggleButton.Text = toggleButton.Text == "Hide Matrix Cells" ? "Show Matrix Cells" : "Hide Matrix Cells";
         }
 
-        private void Export_OnClicked(object sender, EventArgs e)
+        private string MatrixToStringUnicodeMath()
         {
-            string onenoteMatrixString = "■(";
+            string unicodeMathMatrixString = "■(";
 
             //todo Replace with a single for loop to improve performance
             for (int i = 0; i < MatrixGrid.RowDefinitions.Count; i++)
             {
                 for (int j = 0; j < MatrixGrid.ColumnDefinitions.Count; j++)
                 {
-                    onenoteMatrixString +=
-                        ((BorderEntry) MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j]).Text;
+                    unicodeMathMatrixString +=
+                        ((BorderEntry)MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j]).Text;
 
                     if (j < MatrixGrid.ColumnDefinitions.Count - 1)
                     {
-                        onenoteMatrixString += '&';
+                        unicodeMathMatrixString += '&';
                     }
                 }
 
                 if (i < MatrixGrid.RowDefinitions.Count - 1)
                 {
-                    onenoteMatrixString += '@';
+                    unicodeMathMatrixString += '@';
                 }
             }
 
-            onenoteMatrixString += ')';
+            unicodeMathMatrixString += ')';
+
+            return unicodeMathMatrixString;
+        }
+
+        //todo Join with UnicodeMath string converter, function structure is identical, only string structure varies
+        //todo Support bracket/paren delimiters, i.e. pmatrix, Bmatrix,...
+        private string MatrixToStringAmsmath()
+        {
+            string amsmathMatrixString = @"\begin{matrix}";
+
+            //todo Replace with a single for loop to improve performance
+            for (int i = 0; i < MatrixGrid.RowDefinitions.Count; i++)
+            {
+                for (int j = 0; j < MatrixGrid.ColumnDefinitions.Count; j++)
+                {
+                    amsmathMatrixString +=
+                        ((BorderEntry)MatrixGrid.Children[i * MatrixGrid.ColumnDefinitions.Count + j]).Text;
+
+                    if (j < MatrixGrid.ColumnDefinitions.Count - 1)
+                    {
+                        amsmathMatrixString += " & ";
+                    }
+                }
+
+                if (i < MatrixGrid.RowDefinitions.Count - 1)
+                {
+                    amsmathMatrixString += @"\\";
+                }
+            }
+
+            amsmathMatrixString += @"\end{matrix}";
+
+            return amsmathMatrixString;
+        }
+
+        private void Export_OnClicked(object sender, EventArgs e)
+        {
+            string matrixString = FormatPicker.SelectedIndex == 0 ? MatrixToStringUnicodeMath() : MatrixToStringAmsmath();
 
             //todo Determine how to use mathml clipboard type to allow pasting into onenote within a equation
-            Clipboard.SetTextAsync(onenoteMatrixString);
+            Clipboard.SetTextAsync(matrixString);
             DependencyService.Get<IMessageToast>().DisplayToast("Copied to Clipboard.");
         }
 
         private async void Import_OnClicked(object sender, EventArgs e)
         {
+            //Todo add emum to make it clearer what the indices mean
+            if (FormatPicker.SelectedIndex == 1)
+            {
+                DependencyService.Get<IMessageToast>().DisplayToast("Not yet supported.");
+                return;
+            }
+
             string onenoteMatrixString = await Clipboard.GetTextAsync();
 
             if (onenoteMatrixString.Length < 2 || !onenoteMatrixString.Contains('('))
             {
+                DependencyService.Get<IMessageToast>().DisplayToast("Malformed matrix in clipboard.");
                 return;
             }
 

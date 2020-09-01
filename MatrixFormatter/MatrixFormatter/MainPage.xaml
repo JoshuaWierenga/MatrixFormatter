@@ -17,8 +17,18 @@
             <Button Text="Create Matrix" Clicked="CreateMatrix_OnClicked"/>
             <Button Text="Create Identity Matrix" Clicked="CreateIdentityMatrix_OnClicked"/>
             <Button x:Name="ToggleCellsButton"  Text="Hide Matrix Cells" IsVisible="False" Clicked="ToggleCells_OnClicked"/>
-            <Button Text="Import Matrix from OneNote" Clicked="Import_OnClicked"/>
-            <Button x:Name="ExportButton" Text="Export Matrix to OneNote" IsVisible="False" Clicked="Export_OnClicked"/>
+            
+            <Button HorizontalOptions="EndAndExpand" Text="Import Matrix" Clicked="Import_OnClicked"/>
+            <Button x:Name="ExportButton" Text="Export Matrix" IsVisible="False" Clicked="Export_OnClicked"/>
+            <Picker x:Name="FormatPicker">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>Microsoft Office UnicodeMath</x:String>
+                        <x:String>Latex Amsmath</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+                <Picker.SelectedIndex>0</Picker.SelectedIndex>
+            </Picker>
         </StackLayout>
         <Grid x:Name="MatrixGrid"/>
     </StackLayout>
