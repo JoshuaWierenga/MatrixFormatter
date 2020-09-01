@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
@@ -13,16 +14,14 @@ namespace MatrixFormatter
                 propertyName: "MatrixRows",
                 returnType: typeof(string),
                 declaringType: typeof(MainPage),
-                "0",
-                BindingMode.OneWayToSource);
+                "0");
 
         public static readonly BindableProperty MatrixColumnsProperty =
             BindableProperty.Create(
                 propertyName: "MatrixColumns",
                 returnType: typeof(string),
                 declaringType: typeof(MainPage),
-                "0",
-                BindingMode.OneWayToSource);
+                "0");
 
         public int MatrixRows
         {
@@ -41,9 +40,9 @@ namespace MatrixFormatter
             BindingContext = this;
         }
 
-        private void CreateMatrix_OnClicked(object sender, EventArgs e)
+        private void CreateMatrix()
         {
-            if (MatrixRows == 0 || MatrixColumns == 0 || 
+            if (MatrixRows == 0 || MatrixColumns == 0 ||
                 (MatrixRows == MatrixGrid.RowDefinitions.Count && MatrixColumns == MatrixGrid.ColumnDefinitions.Count))
             {
                 return;
@@ -59,7 +58,7 @@ namespace MatrixFormatter
 
             if (MatrixGrid.RowDefinitions.Count != 0)
             {
-                 cells = new BorderEntry[Math.Min(MatrixRows, MatrixGrid.RowDefinitions.Count), Math.Min(MatrixColumns, MatrixGrid.ColumnDefinitions.Count)];
+                cells = new BorderEntry[Math.Min(MatrixRows, MatrixGrid.RowDefinitions.Count), Math.Min(MatrixColumns, MatrixGrid.ColumnDefinitions.Count)];
 
                 for (int i = 0; i < cells.GetLength(0); i++)
                 {
@@ -117,7 +116,13 @@ namespace MatrixFormatter
                 }
             }
 
+            ToggleCellsButton.IsVisible = true;
             ExportButton.IsVisible = true;
+        }
+
+        private void CreateMatrix_OnClicked(object sender, EventArgs e)
+        {
+            CreateMatrix();
         }
 
         private void CreateIdentityMatrix_OnClicked(object sender, EventArgs e)
@@ -128,7 +133,7 @@ namespace MatrixFormatter
                 return;
             }
 
-            CreateMatrix_OnClicked(sender, e);
+            CreateMatrix();
 
             //todo Replace with a single for loop to improve performance
             for (int i = 0; i < MatrixGrid.RowDefinitions.Count; i++)
@@ -181,6 +186,30 @@ namespace MatrixFormatter
             //todo Determine how to use mathml clipboard type to allow pasting into onenote within a equation
             Clipboard.SetTextAsync(onenoteMatrixString);
             DependencyService.Get<IMessageToast>().DisplayToast("Copied to Clipboard.");
+        }
+
+        private async void Import_OnClicked(object sender, EventArgs e)
+        {
+            string onenoteMatrixString = await Clipboard.GetTextAsync();
+
+            if (onenoteMatrixString.Length < 2 || !onenoteMatrixString.Contains('('))
+            {
+                return;
+            }
+
+            onenoteMatrixString = onenoteMatrixString.Substring(onenoteMatrixString.IndexOf('(') + 1);
+            onenoteMatrixString = onenoteMatrixString.Remove(onenoteMatrixString.Length - 1);
+
+            MatrixRows = onenoteMatrixString.Count(c => c == '@') + 1;
+            MatrixColumns = onenoteMatrixString.Remove(onenoteMatrixString.IndexOf('@')).Count(c => c == '&') + 1;
+            CreateMatrix();
+
+            string[] cellValues = onenoteMatrixString.Split('&', '@');
+
+            for (int i = 0; i < cellValues.Length; i++)
+            {
+                ((BorderEntry) MatrixGrid.Children[i]).Text = cellValues[i];
+            }
         }
     }
 }
