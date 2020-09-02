@@ -71,21 +71,19 @@ namespace MatrixFormatter
 
         private async void Import_OnClicked(object sender, EventArgs e)
         {
-            if (_viewModel.SelectedFormat == MatrixStringFormat.LatexAmsmath)
-            {
-                DependencyService.Get<IMessageToast>().DisplayToast("Not yet supported.");
-                return;
-            }
+            string matrixString = await Clipboard.GetTextAsync();
 
-            string onenoteMatrixString = await Clipboard.GetTextAsync();
-
-            if (onenoteMatrixString.Length < 2 || !onenoteMatrixString.Contains('('))
+            //TODO fix input check
+            if ((_viewModel.SelectedFormat == MatrixStringFormat.UnicodeMath && !matrixString.Contains('(')) 
+                || (_viewModel.SelectedFormat == MatrixStringFormat.LatexAmsmath && !matrixString.Contains('{')))
             {
                 DependencyService.Get<IMessageToast>().DisplayToast("Malformed matrix in clipboard.");
                 return;
             }
 
-            _viewModel.ImportMatrix(MatrixGrid, onenoteMatrixString);
+            _viewModel.ImportMatrix(MatrixGrid, matrixString);
+
+            ShowMatrixButtons();
         }
     }
 }

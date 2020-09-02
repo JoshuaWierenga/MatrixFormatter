@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using MatrixFormatter.Format;
@@ -140,16 +140,29 @@ namespace MatrixFormatter
             return matrixString;
         }
 
-        public void ImportMatrix(Grid matrixGrid, string onenoteMatrixString)
+        public void ImportMatrix(Grid matrixGrid, string matrixString)
         {
-            onenoteMatrixString = onenoteMatrixString.Substring(onenoteMatrixString.IndexOf('(') + 1);
-            onenoteMatrixString = onenoteMatrixString.Remove(onenoteMatrixString.Length - 1);
+            bool latexFormat = SelectedFormat == MatrixStringFormat.LatexAmsmath;
+            matrixString = matrixString.Substring(matrixString.IndexOf(latexFormat ? '}' : '(') + 1);
+            matrixString = matrixString.Remove(matrixString.Length - (latexFormat ? 12 : 1));
 
-            MatrixRows = onenoteMatrixString.Count(c => c == '@') + 1;
-            MatrixColumns = onenoteMatrixString.Remove(onenoteMatrixString.IndexOf('@')).Count(c => c == '&') + 1;
+            if (latexFormat)
+            {
+                MatrixRows = matrixString.Count(c => c == '\\') / 2 + 1;
+            }
+            else
+            {
+                MatrixRows = matrixString.Count(c => c == '@') + 1;
+            }
+
+            MatrixColumns = matrixString
+                .Remove(matrixString.IndexOf(latexFormat ? @"\\" : "@", StringComparison.Ordinal))
+                .Count(c => c == '&') + 1;
+
             CreateMatrix(matrixGrid);
 
-            string[] cellValues = onenoteMatrixString.Split('&', '@');
+            string[] rowColumnDelimiters = latexFormat ? new[]{ " & ", @"\\" } : new[]{ "&", "@" } ;
+            string[] cellValues = matrixString.Split(rowColumnDelimiters, StringSplitOptions.None);
 
             for (int i = 0; i < cellValues.Length; i++)
             {
