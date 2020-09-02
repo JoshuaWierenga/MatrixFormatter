@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MatrixFormatter.Format;
@@ -114,20 +114,25 @@ namespace MatrixFormatter
             bool latexFormat = SelectedFormat == MatrixStringFormat.LatexAmsmath;
             string matrixString = latexFormat ? @"\begin{matrix}" : "■(";
 
-            foreach (BorderEntry view in matrixGrid.Children)
+            for (int i = 0; i < matrixGrid.RowDefinitions.Count; i++)
             {
-                matrixString += view.Text;
+                for (int j = 0; j < matrixGrid.ColumnDefinitions.Count; j++)
+                {
+                    //TODO Determine if any performance can be gained by using OrderBy and so getting a list of all children according to this condition
+                    BorderEntry view = (BorderEntry)matrixGrid.Children.Single(c => Grid.GetRow(c) == i && Grid.GetColumn(c) == j);
+                    matrixString += view.Text;
 
-                if (Grid.GetColumn(view) == matrixGrid.ColumnDefinitions.Count - 1)
-                {
-                    if (Grid.GetRow(view) != matrixGrid.RowDefinitions.Count - 1)
+                    if (Grid.GetColumn(view) == matrixGrid.ColumnDefinitions.Count - 1)
                     {
-                        matrixString += latexFormat ? @"\\" : "@";
+                        if (Grid.GetRow(view) != matrixGrid.RowDefinitions.Count - 1)
+                        {
+                            matrixString += latexFormat ? @"\\" : "@";
+                        }
                     }
-                }
-                else
-                {
-                    matrixString += latexFormat ? " & " : "&";
+                    else
+                    {
+                        matrixString += latexFormat ? " & " : "&";
+                    }
                 }
             }
 
