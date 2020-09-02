@@ -54,73 +54,59 @@ namespace MatrixFormatter
                 return;
             }
 
-            BorderEntry[,] cells = null;
-
             RowDefinition newRow = new RowDefinition
             {
                 Height = GridLength.Auto
             };
             ColumnDefinition newColumn = new ColumnDefinition();
 
-            if (matrixGrid.RowDefinitions.Count != 0)
+            //TODO consider changing bounds to improve speed, i.e. no cell in [0, MatrixRows - 1] will be removed when MatrixRows < matrixGrid.ColumnDefinitions.Count
+            //Remove unneeded cells
+            for (int i = matrixGrid.Children.Count - 1; i >= 0; i--)
             {
-                cells = new BorderEntry[Math.Min(MatrixRows, matrixGrid.RowDefinitions.Count), Math.Min(MatrixColumns, matrixGrid.ColumnDefinitions.Count)];
+                View cell = matrixGrid.Children[i];
 
-                for (int i = 0; i < cells.GetLength(0); i++)
+                //TODO same as above comment but consider jumping entire rows if possible
+                if (Grid.GetRow(cell) >= MatrixRows || Grid.GetColumn(cell) >= MatrixColumns)
                 {
-                    for (int j = 0; j < cells.GetLength(1); j++)
-                    {
-                        cells[i, j] = (BorderEntry)matrixGrid.Children[i * matrixGrid.ColumnDefinitions.Count + j];
-                    }
+                    matrixGrid.Children.Remove(cell);
                 }
             }
 
-            //Todo figure out how to edit grid in place despite it being a single dimensional array
-            matrixGrid.Children.Clear();
-
-            for (int i = 0; i < Math.Max(MatrixRows, matrixGrid.RowDefinitions.Count); i++)
+            //Remove unneeded rows
+            for (int i = matrixGrid.RowDefinitions.Count - 1; i >= MatrixRows; i--)
             {
-                if (i < MatrixRows)
-                {
-                    if (matrixGrid.RowDefinitions.Count < i + 1)
-                    {
-                        matrixGrid.RowDefinitions.Add(newRow);
-                    }
+                matrixGrid.RowDefinitions.RemoveAt(i);
+            }
 
-                    for (int j = 0; j < Math.Max(MatrixColumns, matrixGrid.ColumnDefinitions.Count); j++)
-                    {
-                        if (j < MatrixColumns)
-                        {
-                            if (matrixGrid.ColumnDefinitions.Count < j + 1)
-                            {
-                                matrixGrid.ColumnDefinitions.Add(newColumn);
-                            }
+            //Remove unneeded columns
+            for (int i = matrixGrid.ColumnDefinitions.Count - 1; i >= MatrixColumns; i--)
+            {
+                matrixGrid.ColumnDefinitions.RemoveAt(i);
+            }
 
-                            if (i < cells?.GetLength(0) && j < cells.GetLength(1))
-                            {
-                                matrixGrid.Children.Add(cells[i, j], j, j + 1, i, i + 1);
-                            }
-                            else
-                            {
-                                matrixGrid.Children.Add(new BorderEntry(), j, j + 1, i, i + 1);
-                            }
-                        }
-                        else
-                        {
-                            matrixGrid.ColumnDefinitions.RemoveAt(i);
-                        }
-                    }
-                }
-                //Todo fix this, it is currently not being used
-                else if (i == MatrixRows && i >= matrixGrid.RowDefinitions.Count)
+            //Add new columns with cells
+            for (int i = matrixGrid.ColumnDefinitions.Count; i < MatrixColumns; i++)
+            {
+                matrixGrid.ColumnDefinitions.Add(newColumn);
+
+                for (int j = 0; j < matrixGrid.RowDefinitions.Count; j++)
                 {
-                    matrixGrid.RowDefinitions.Add(new RowDefinition());
-                }
-                else
-                {
-                    matrixGrid.RowDefinitions.RemoveAt(i);
+                    matrixGrid.Children.Add(new BorderEntry(), i, j);
                 }
             }
+
+            //Add new rows with cells
+            for (int i = matrixGrid.RowDefinitions.Count; i < MatrixRows; i++)
+            {
+                matrixGrid.RowDefinitions.Add(newRow);
+
+                for (int j = 0; j < matrixGrid.ColumnDefinitions.Count; j++)
+                {
+                    matrixGrid.Children.Add(new BorderEntry(), j, i);
+                }
+            }
+
         }
 
         public string ExportMatrix(Grid matrixGrid)
