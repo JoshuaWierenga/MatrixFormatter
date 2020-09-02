@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:format="clr-namespace:MatrixFormatter.Format;assembly=MatrixFormatter"
-             x:Class="MatrixFormatter.MainPage">
+             x:Class="MatrixFormatter.MainView">
     <ContentPage.Resources>
         <ResourceDictionary>
             <format:IntEnumConverter x:Key="IntEnum"/>

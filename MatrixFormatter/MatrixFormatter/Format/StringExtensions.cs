@@ -2,6 +2,7 @@
 
 namespace MatrixFormatter.Format
 {
+    //From https://alexdunn.org/2017/05/16/xamarin-tip-binding-a-picker-to-an-enum/
     public static class StringExtensions
     {
         public static string SplitCamelCase(this string str)
