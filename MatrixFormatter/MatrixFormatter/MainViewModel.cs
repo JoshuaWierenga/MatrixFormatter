@@ -38,13 +38,23 @@ namespace MatrixFormatter
 
         public MatrixStringFormat SelectedFormat { get; set; }
 
-        public List<string> MatrixStringFormats
+        public List<string> MatrixStringFormats { get; } = Enum.GetNames(typeof(MatrixStringFormat)).Select(b => b.SplitCamelCase()).ToList();
+
+        public bool IsLatexSelected => SelectedFormat == MatrixStringFormat.LatexAmsmath;
+
+        private static readonly Dictionary<string, string> LatexDelimiters = new Dictionary<string, string>
         {
-            get
-            {
-                return Enum.GetNames(typeof(MatrixStringFormat)).Select(b => b.SplitCamelCase()).ToList();
-            }
-        }
+            {"No Delimiters", "matrix"},
+            {"Parentheses", "pmatrix"},
+            {"Brackets", "bmatrix"},
+            {"Braces", "Bmatrix"},
+            {"Pipes", "vmatrix"},
+            {"Double Pipes", "Vmatrix"}
+        };
+
+        public List<string> LatexDelimiterNames { get; } = LatexDelimiters.Keys.ToList();
+
+        public string SelectedLatexDelimiter { get; set; }
 
         public void CreateMatrix(Grid matrixGrid)
         {
@@ -111,8 +121,7 @@ namespace MatrixFormatter
 
         public string ExportMatrix(Grid matrixGrid)
         {
-            bool latexFormat = SelectedFormat == MatrixStringFormat.LatexAmsmath;
-            string matrixString = latexFormat ? @"\begin{matrix}" : "■(";
+            string matrixString = IsLatexSelected ? @"\begin{" + LatexDelimiters[SelectedLatexDelimiter] + "}" : "■(";
 
             for (int i = 0; i < matrixGrid.RowDefinitions.Count; i++)
             {
@@ -126,27 +135,26 @@ namespace MatrixFormatter
                     {
                         if (Grid.GetRow(view) != matrixGrid.RowDefinitions.Count - 1)
                         {
-                            matrixString += latexFormat ? @"\\" : "@";
+                            matrixString += IsLatexSelected ? @"\\" : "@";
                         }
                     }
                     else
                     {
-                        matrixString += latexFormat ? " & " : "&";
+                        matrixString += IsLatexSelected ? " & " : "&";
                     }
                 }
             }
 
-            matrixString += latexFormat ? @"\end{matrix}" : ")";
+            matrixString += IsLatexSelected ? @"\end{" + LatexDelimiters[SelectedLatexDelimiter] + "}" : ")";
             return matrixString;
         }
 
         public void ImportMatrix(Grid matrixGrid, string matrixString)
         {
-            bool latexFormat = SelectedFormat == MatrixStringFormat.LatexAmsmath;
-            matrixString = matrixString.Substring(matrixString.IndexOf(latexFormat ? '}' : '(') + 1);
-            matrixString = matrixString.Remove(matrixString.Length - (latexFormat ? 12 : 1));
+            matrixString = matrixString.Substring(matrixString.IndexOf(IsLatexSelected ? '}' : '(') + 1);
+            matrixString = matrixString.Remove(matrixString.Length - (IsLatexSelected ? 12 : 1));
 
-            if (latexFormat)
+            if (IsLatexSelected)
             {
                 MatrixRows = matrixString.Count(c => c == '\\') / 2 + 1;
             }
@@ -156,12 +164,12 @@ namespace MatrixFormatter
             }
 
             MatrixColumns = matrixString
-                .Remove(matrixString.IndexOf(latexFormat ? @"\\" : "@", StringComparison.Ordinal))
+                .Remove(matrixString.IndexOf(IsLatexSelected ? @"\\" : "@", StringComparison.Ordinal))
                 .Count(c => c == '&') + 1;
 
             CreateMatrix(matrixGrid);
 
-            string[] rowColumnDelimiters = latexFormat ? new[]{ " & ", @"\\" } : new[]{ "&", "@" } ;
+            string[] rowColumnDelimiters = IsLatexSelected ? new[]{ " & ", @"\\" } : new[]{ "&", "@" } ;
             string[] cellValues = matrixString.Split(rowColumnDelimiters, StringSplitOptions.None);
 
             for (int i = 0; i < cellValues.Length; i++)

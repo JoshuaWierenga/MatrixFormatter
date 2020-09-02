@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using MatrixFormatter.Format;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
@@ -14,6 +13,8 @@ namespace MatrixFormatter
         {
             InitializeComponent();
             BindingContext = _viewModel;
+            //This is here because for some reason it will not work in xaml
+            LatexDelimiterPicker.SelectedIndex = 0;
         }
 
         private void ShowMatrixButtons()
@@ -59,7 +60,6 @@ namespace MatrixFormatter
             toggleButton.Text = toggleButton.Text == "Hide Matrix Cells" ? "Show Matrix Cells" : "Hide Matrix Cells";
         }
 
-        //todo Support latex bracket/paren delimiters, i.e. pmatrix, Bmatrix,...
         private async void Export_OnClicked(object sender, EventArgs e)
         {
             string matrixString = _viewModel.ExportMatrix(MatrixGrid);
@@ -74,8 +74,8 @@ namespace MatrixFormatter
             string matrixString = await Clipboard.GetTextAsync();
 
             //TODO fix input check
-            if ((_viewModel.SelectedFormat == MatrixStringFormat.UnicodeMath && !matrixString.Contains('(')) 
-                || (_viewModel.SelectedFormat == MatrixStringFormat.LatexAmsmath && !matrixString.Contains('{')))
+            if ((!_viewModel.IsLatexSelected && !matrixString.Contains('(')) 
+                || (_viewModel.IsLatexSelected && !matrixString.Contains('{')))
             {
                 DependencyService.Get<IMessageToast>().DisplayToast("Malformed matrix in clipboard.");
                 return;
@@ -84,6 +84,11 @@ namespace MatrixFormatter
             _viewModel.ImportMatrix(MatrixGrid, matrixString);
 
             ShowMatrixButtons();
+        }
+
+        private void FormatPicker_OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            LatexDelimiterPicker.IsVisible = _viewModel.IsLatexSelected;
         }
     }
 }

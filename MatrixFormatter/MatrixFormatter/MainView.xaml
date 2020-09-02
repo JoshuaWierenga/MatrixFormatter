@@ -26,7 +26,8 @@
             
             <Button HorizontalOptions="EndAndExpand" Text="Import Matrix" Clicked="Import_OnClicked"/>
             <Button x:Name="ExportButton" Text="Export Matrix" IsVisible="False" Clicked="Export_OnClicked"/>
-            <Picker ItemsSource="{Binding MatrixStringFormats}" SelectedIndex="{Binding SelectedFormat, Converter={StaticResource IntEnum}}" />
+            <Picker x:Name="LatexDelimiterPicker" IsVisible="False" ItemsSource="{Binding LatexDelimiterNames}" SelectedItem="{Binding SelectedLatexDelimiter}"/>
+            <Picker ItemsSource="{Binding MatrixStringFormats}" SelectedIndex="{Binding SelectedFormat, Converter={StaticResource IntEnum}}" SelectedIndexChanged="FormatPicker_OnSelectedIndexChanged"/>
         </StackLayout>
         <Grid x:Name="MatrixGrid"/>
     </StackLayout>
