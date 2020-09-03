@@ -13,8 +13,6 @@ namespace MatrixFormatter
         {
             InitializeComponent();
             BindingContext = _viewModel;
-            //This is here because for some reason it will not work in xaml
-            LatexDelimiterPicker.SelectedIndex = 0;
         }
 
         private void ShowMatrixButtons()

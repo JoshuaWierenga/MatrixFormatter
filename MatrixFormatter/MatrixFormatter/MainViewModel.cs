@@ -6,35 +6,12 @@ using Xamarin.Forms;
 
 namespace MatrixFormatter
 {
-    public class MainViewModel : BindableObject
+    public class MainViewModel
     {
-        //todo remove the binds since changes to these doesn't update the matrix directly, should it?
         //todo Change default to be positive
         //todo Ensure input is a positive integer
-        public static readonly BindableProperty MatrixRowsProperty =
-            BindableProperty.Create(
-                propertyName: "MatrixRows",
-                returnType: typeof(string),
-                declaringType: typeof(MainViewModel),
-                "0");
-
-        public static readonly BindableProperty MatrixColumnsProperty =
-            BindableProperty.Create(
-                propertyName: "MatrixColumns",
-                returnType: typeof(string),
-                declaringType: typeof(MainViewModel),
-                "0");
-
-        public int MatrixRows
-        {
-            get => int.Parse((string)GetValue(MatrixRowsProperty));
-            set => SetValue(MatrixRowsProperty, value);
-        }
-        public int MatrixColumns
-        {
-            get => int.Parse((string)GetValue(MatrixColumnsProperty));
-            set => SetValue(MatrixColumnsProperty, value);
-        }
+        public int MatrixRows { get; set; }
+        public int MatrixColumns { get; set; }
 
         public MatrixStringFormat SelectedFormat { get; set; }
 
@@ -54,7 +31,7 @@ namespace MatrixFormatter
 
         public List<string> LatexDelimiterNames { get; } = LatexDelimiters.Keys.ToList();
 
-        public string SelectedLatexDelimiter { get; set; }
+        public string SelectedLatexDelimiter { get; set; } = LatexDelimiters.Keys.First();
 
         public void CreateMatrix(Grid matrixGrid)
         {
