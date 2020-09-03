@@ -8,6 +8,7 @@ namespace MatrixFormatter
 {
     public class MainViewModel
     {
+        //todo Readd bindings, removing them prevents the ui from updating to show the matrix size when importing is used
         //todo Change default to be positive
         public int MatrixRows { get; set; }
         public int MatrixColumns { get; set; }
@@ -32,16 +33,16 @@ namespace MatrixFormatter
 
         public string SelectedLatexDelimiter { get; set; } = LatexDelimiters.Keys.First();
 
-        public void CreateMatrix(Grid matrixGrid)
+        public bool CreateMatrix(Grid matrixGrid)
         {
             if (MatrixRows <= 0 || MatrixColumns <= 0)
             {
                 DependencyService.Get<IMessageToast>().DisplayToast("Invalid Matrix Size.");
-                return;
+                return false;
             }
             if (MatrixRows == matrixGrid.RowDefinitions.Count && MatrixColumns == matrixGrid.ColumnDefinitions.Count)
             {
-                return;
+                return false;
             }
 
             RowDefinition newRow = new RowDefinition
@@ -96,6 +97,7 @@ namespace MatrixFormatter
                 }
             }
 
+            return true;
         }
 
         public string ExportMatrix(Grid matrixGrid)

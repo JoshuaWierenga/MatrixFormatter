@@ -23,8 +23,10 @@ namespace MatrixFormatter
 
         private void CreateMatrix_OnClicked(object sender, EventArgs e)
         {
-            _viewModel.CreateMatrix(MatrixGrid);
-            ShowMatrixButtons();
+            if (_viewModel.CreateMatrix(MatrixGrid))
+            {
+                ShowMatrixButtons();
+            }
         }
 
         private void CreateIdentityMatrix_OnClicked(object sender, EventArgs e)
@@ -35,15 +37,16 @@ namespace MatrixFormatter
                 return;
             }
 
-            _viewModel.CreateMatrix(MatrixGrid);
+            if (_viewModel.CreateMatrix(MatrixGrid))
+            {
+                ShowMatrixButtons();
+            }
 
             //todo Make part of CreateMatrix?
             foreach (BorderEntry view in MatrixGrid.Children)
             {
                 view.Text = Grid.GetRow(view) == Grid.GetColumn(view) ? "1" : "0";
             }
-
-            ShowMatrixButtons();
         }
 
         private void ToggleCells_OnClicked(object sender, EventArgs e)
@@ -75,6 +78,13 @@ namespace MatrixFormatter
                 || (_viewModel.IsLatexSelected && (!matrixString.StartsWith(@"\begin{") || !matrixString.Contains("matrix}") || !matrixString.Contains(@"\end{") || !matrixString.EndsWith("}"))))
             {
                 DependencyService.Get<IMessageToast>().DisplayToast("Malformed matrix in clipboard.");
+                return;
+            }
+
+            //TODO Fix 1xn matrices crashing within ImportMatrix
+            if (matrixString.Count(c => c == '\\') == 0 && matrixString.Count(c => c == '@') == 0)
+            {
+                DependencyService.Get<IMessageToast>().DisplayToast("1 by n matrices are not currently supported.");
                 return;
             }
 
