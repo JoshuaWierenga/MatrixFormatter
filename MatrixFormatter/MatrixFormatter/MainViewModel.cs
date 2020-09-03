@@ -47,9 +47,8 @@ namespace MatrixFormatter
             };
             ColumnDefinition newColumn = new ColumnDefinition();
 
-            //TODO consider changing bounds to improve speed, i.e. no cell in [0, MatrixRows - 1] will be removed when MatrixRows < matrixGrid.ColumnDefinitions.Count
             //Remove unneeded cells
-            for (int i = matrixGrid.Children.Count - 1; i >= 0; i--)
+            for (int i = matrixGrid.Children.Count - 1; i >= MatrixRows; i--)
             {
                 View cell = matrixGrid.Children[i];
 
@@ -100,25 +99,23 @@ namespace MatrixFormatter
         {
             string matrixString = IsLatexSelected ? @"\begin{" + LatexDelimiters[SelectedLatexDelimiter] + "}" : "■(";
 
-            for (int i = 0; i < matrixGrid.RowDefinitions.Count; i++)
-            {
-                for (int j = 0; j < matrixGrid.ColumnDefinitions.Count; j++)
-                {
-                    //TODO Determine if any performance can be gained by using OrderBy and so getting a list of all children according to this condition
-                    BorderEntry view = (BorderEntry)matrixGrid.Children.Single(c => Grid.GetRow(c) == i && Grid.GetColumn(c) == j);
-                    matrixString += view.Text;
+            OrderedParallelQuery<View> orderedCells = matrixGrid.Children.AsParallel().OrderBy(c =>
+                Grid.GetRow(c) * matrixGrid.ColumnDefinitions.Count + Grid.GetColumn(c));
 
-                    if (Grid.GetColumn(view) == matrixGrid.ColumnDefinitions.Count - 1)
+            foreach (BorderEntry view in orderedCells)
+            {
+                matrixString += view.Text;
+
+                if (Grid.GetColumn(view) == matrixGrid.ColumnDefinitions.Count - 1)
+                {
+                    if (Grid.GetRow(view) != matrixGrid.RowDefinitions.Count - 1)
                     {
-                        if (Grid.GetRow(view) != matrixGrid.RowDefinitions.Count - 1)
-                        {
-                            matrixString += IsLatexSelected ? @"\\" : "@";
-                        }
+                        matrixString += IsLatexSelected ? @"\\" : "@";
                     }
-                    else
-                    {
-                        matrixString += IsLatexSelected ? " & " : "&";
-                    }
+                }
+                else
+                {
+                    matrixString += IsLatexSelected ? " & " : "&";
                 }
             }
 
