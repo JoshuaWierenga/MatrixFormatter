@@ -9,7 +9,6 @@ namespace MatrixFormatter
     public class MainViewModel
     {
         //todo Change default to be positive
-        //todo Ensure input is a positive integer
         public int MatrixRows { get; set; }
         public int MatrixColumns { get; set; }
 
@@ -35,8 +34,12 @@ namespace MatrixFormatter
 
         public void CreateMatrix(Grid matrixGrid)
         {
-            if (MatrixRows == 0 || MatrixColumns == 0 ||
-                (MatrixRows == matrixGrid.RowDefinitions.Count && MatrixColumns == matrixGrid.ColumnDefinitions.Count))
+            if (MatrixRows <= 0 || MatrixColumns <= 0)
+            {
+                DependencyService.Get<IMessageToast>().DisplayToast("Invalid Matrix Size.");
+                return;
+            }
+            if (MatrixRows == matrixGrid.RowDefinitions.Count && MatrixColumns == matrixGrid.ColumnDefinitions.Count)
             {
                 return;
             }
@@ -52,7 +55,7 @@ namespace MatrixFormatter
             {
                 View cell = matrixGrid.Children[i];
 
-                //TODO same as above comment but consider jumping entire rows if possible
+                //TODO Consider jumping MatrixRow cells when i is between n*MatrixRows and N*MatrixRows + MatrixColumns
                 if (Grid.GetRow(cell) >= MatrixRows || Grid.GetColumn(cell) >= MatrixColumns)
                 {
                     matrixGrid.Children.Remove(cell);

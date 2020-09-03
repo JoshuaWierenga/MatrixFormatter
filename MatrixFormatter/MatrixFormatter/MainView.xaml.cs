@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -71,9 +71,8 @@ namespace MatrixFormatter
         {
             string matrixString = await Clipboard.GetTextAsync();
 
-            //TODO fix input check
-            if ((!_viewModel.IsLatexSelected && !matrixString.Contains('(')) 
-                || (_viewModel.IsLatexSelected && !matrixString.Contains('{')))
+            if ((!_viewModel.IsLatexSelected && (!matrixString.StartsWith("■(") || !matrixString.EndsWith(")"))) 
+                || (_viewModel.IsLatexSelected && (!matrixString.StartsWith(@"\begin{") || !matrixString.Contains("matrix}") || !matrixString.Contains(@"\end{") || !matrixString.EndsWith("}"))))
             {
                 DependencyService.Get<IMessageToast>().DisplayToast("Malformed matrix in clipboard.");
                 return;
